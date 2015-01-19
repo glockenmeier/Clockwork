@@ -1,0 +1,18 @@
+!MaterialAsset
+Id: 3724db52-70d7-4ffa-a3c0-ea493dd38970
+BuildOrder: 250
+Tags: []
+Material:
+    Nodes:
+        Diffuse: !MaterialTextureNode
+            TextureReference: 5da9585c-39c7-4180-8845-847b9047ed0c:moutain
+            Filtering: Anisotropic
+            Scale: {X: 0.25, Y: 0.25}
+            Offset: {X: 0, Y: 0}
+            AutoAssignKey: false
+            Key: Texturing.Texture1
+    ColorNodes:
+        MaterialParameters.AlbedoDiffuse: Diffuse
+    Parameters:
+        Capacity: 0
+        ~Items: {}

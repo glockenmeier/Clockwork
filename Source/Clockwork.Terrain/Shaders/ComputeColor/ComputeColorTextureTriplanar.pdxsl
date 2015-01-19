@@ -1,0 +1,20 @@
+﻿class ComputeColorTextureTriplanar<Texture2D TTexture, float2 TScale, SamplerState TSampler> : NormalStream, PositionStream, ComputeColor
+{
+    override float4 Compute()
+    {
+        const float plateauSize = 0.1;
+        const float transitionSpeed = 1;
+
+        float3 weights = abs(streams.vNormal);
+        weights = max(weights - plateauSize, 0);
+        weights = pow(weights, transitionSpeed);
+
+        float3x4 colors;
+        colors[0] = TTexture.Sample(TSampler, streams.Position.yz * TScale);
+        colors[1] = TTexture.Sample(TSampler, streams.Position.zx * TScale);
+        colors[2] = TTexture.Sample(TSampler, streams.Position.xy * TScale);
+
+        // TODO: Do we need to take alpha into account?
+        return mul(weights, colors);
+    }
+};

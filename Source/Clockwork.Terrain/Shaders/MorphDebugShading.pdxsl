@@ -1,0 +1,70 @@
+﻿class MorphDebugShading : TerrainBase, PositionStream
+{
+    // Deviation from optimal lod 
+    /*
+    override stage void PSMain()
+    {
+        streams.ColorTarget = float4(streams.MorphAmount, 1 - streams.MorphAmount, 0, 1);
+
+        float textureSize = 512;
+
+        float t = lerp(textureSize, textureSize * 0.5, streams.MorphAmount);
+        float2 dx = ddx(streams.TileTexCoord * t);
+        float2 dy = ddy(streams.TileTexCoord * t);
+        float d = max(dot(dx, dx), dot(dy, dy));
+        float v = 0.5 * log2(d);
+        //float v = HeightMap.CalculateLevelOfDetail(HeightMapSampler, streams.TileTexCoord);
+        //v = lerp(v, v - 1, streams.MorphAmount);
+
+        // If we are not near the edges of the morph area, we can adjust the lod
+        // towards the optimal value
+        float lod = saturate(streams.MorphAmount + v * (streams.MorphAmount - 1) * streams.MorphAmount);
+        v = v - (lod - streams.MorphAmount);
+
+        streams.ColorTarget = float4(v, -v, 0, 1);
+    }
+    */
+
+    override stage void PSMain()
+    {
+        static const float3 rainbow[5] =
+        {
+            float3(108, 200, 215) / 255,
+            float3(253, 200, 132) / 255,
+            float3(192, 255, 114) / 255,
+            float3(246, 137, 166) / 255,
+            float3(174, 127, 199) / 255,
+        };
+        const int rainbowCount = 5;
+
+        // Rainbow
+        float3 color = rainbow[streams.TileTexCoord.z % rainbowCount];
+        float3 parentColor = rainbow[streams.ParentTexCoord.z % rainbowCount];
+        color *= 1 + 0.02 * (streams.TileTexCoord.z % 11 - 5);
+        streams.ColorTarget = float4(color, 1);
+
+        // Morph amount
+//        streams.ColorTarget = float4(streams.MorphAmount, 1 - streams.MorphAmount, 0, 1);
+
+        streams.ColorTarget = float4(streams.TexCoord, 0, 1);
+    }
+
+    /*
+    // Normals
+    [maxvertexcount(6)]
+    void GSMain(triangle Input input[3], inout LineStream<Output> lineStream)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            streams = input[i];
+            lineStream.Append(streams);
+
+            float4 pos = mul(streams.Position + float4(normalize(streams.vNormal), 0), Transformation.WorldViewProjection);
+            streams.ShadingPosition = pos;
+            lineStream.Append(streams);
+
+            lineStream.RestartStrip();
+        }
+    }
+    */
+};

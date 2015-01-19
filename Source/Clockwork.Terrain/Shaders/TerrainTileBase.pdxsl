@@ -1,0 +1,14 @@
+﻿class TerrainTileBase
+{
+    struct TerrainTileInfo
+    {
+        float2 Offset;
+        float2 OffsetToParent; 
+        float Scale;
+        float Level;
+        float TextureIndex;
+        float ParentTextureIndex;
+    };
+
+    abstract TerrainTileInfo GetTileInfo();
+};

@@ -1,0 +1,18 @@
+﻿class ComputeColorSplatted : ComputeColor, SplattingBase
+{
+    compose ComputeColor Layers[]; 
+
+    override float4 Compute()
+    {
+        float4 result = 0;
+
+        int index = 0;
+        foreach (var layer in Layers)
+        {
+            result += layer.Compute() * GetWeight(index);
+            index++;
+        }
+
+        return result;
+    }
+};

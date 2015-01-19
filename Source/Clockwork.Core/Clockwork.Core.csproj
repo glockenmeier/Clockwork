@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{70E06AAF-48B2-4E0E-82DB-59092188A40F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Clockwork</RootNamespace>
+    <AssemblyName>Clockwork.Core</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile111</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SiliconStudioCurrentPackagePath>$(MSBuildThisFileDirectory)..\..\Clockwork.pdxpkg</SiliconStudioCurrentPackagePath>
+    <SiliconStudioPackageProps>$([System.IO.Path]::ChangeExtension('$(SiliconStudioCurrentPackagePath)', '.props'))</SiliconStudioPackageProps>
+    <SiliconStudioProjectType>Library</SiliconStudioProjectType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE;SILICONSTUDIO_PLATFORM_WINDOWS;SILICONSTUDIO_PLATFORM_WINDOWS_DESKTOP</DefineConstants>
+    <SiliconStudioPlatform>Windows</SiliconStudioPlatform>
+    <SiliconStudioParadoxGraphicsApi>Direct3D11</SiliconStudioParadoxGraphicsApi>
+    <SiliconStudioBuildProfile>Windows</SiliconStudioBuildProfile>
+    <OutputPath>..\Bin\Windows-Direct3D11\Debug\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;SILICONSTUDIO_PLATFORM_WINDOWS;SILICONSTUDIO_PLATFORM_WINDOWS_DESKTOP</DefineConstants>
+    <SiliconStudioPlatform>Windows</SiliconStudioPlatform>
+    <SiliconStudioParadoxGraphicsApi>Direct3D11</SiliconStudioParadoxGraphicsApi>
+    <SiliconStudioBuildProfile>Windows</SiliconStudioBuildProfile>
+    <OutputPath>..\Bin\Windows-Direct3D11\Release\</OutputPath>
+    <IntermediateOutputPath>obj\Windows\Release\</IntermediateOutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Input\InputManagerExtensions.cs" />
+    <Compile Include="StateMachines\IStateContext.cs" />
+    <Compile Include="Serialization\ContentTile.cs" />
+    <Compile Include="Serialization\DataRange.cs" />
+    <Compile Include="Serialization\IVisibleRanges.cs" />
+    <Compile Include="Serialization\QuadTreeContentTile.cs" />
+    <Compile Include="Serialization\TiledContent.cs" />
+    <Compile Include="Serialization\QuadTreeContent.cs" />
+    <Compile Include="Serialization\QuadTreeSelection.cs" />
+    <Compile Include="Serialization\RegularGridContentObserver.cs" />
+    <Compile Include="Serialization\RegularGridContent.cs" />
+    <Compile Include="Serialization\QuadTreeContentObserver.cs" />
+    <Compile Include="Serialization\TileState.cs" />
+    <Compile Include="BoundingFrustum.cs" />
+    <Compile Include="Camera.cs" />
+    <Compile Include="DataStructures\IntegerPool.cs" />
+    <Compile Include="Serialization\RegularGridContentData.cs" />
+    <Compile Include="Serialization\TiledContentChannel.cs" />
+    <Compile Include="Threading\AsyncLock.cs" />
+    <Compile Include="Threading\AsyncSemaphore.cs" />
+    <Compile Include="Threading\ForkingSynchronizationContext.cs" />
+    <Compile Include="Shaders\ImageShaderBase.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>ImageShaderBase.pdxsl</DependentUpon>
+    </Compile>
+    <None Include="Shaders\VolumeShaderBase.pdxsl">
+      <Generator>ParadoxShaderKeyGenerator</Generator>
+      <LastGenOutput>VolumeShaderBase.cs</LastGenOutput>
+    </None>
+    <Compile Include="Shaders\VolumeShaderBase.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>VolumeShaderBase.pdxsl</DependentUpon>
+    </Compile>
+    <Compile Include="Graphics\RenderTargetPool.cs" />
+    <None Include="Graphics\RenderTargetStack.cs" />
+    <Compile Include="HeightMap.cs" />
+    <Compile Include="DataStructures\Octree.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DataStructures\QuadTree.cs" />
+    <Compile Include="DataStructures\SpacePartitionTree.cs" />
+    <Compile Include="StateMachines\IState.cs" />
+    <Compile Include="StateMachines\ITransition.cs" />
+    <Compile Include="StateMachines\State.cs" />
+    <Compile Include="StateMachines\StateExtensions.cs" />
+    <Compile Include="StateMachines\StateMachine.cs" />
+    <Compile Include="StateMachines\StateMachneEvent.cs" />
+    <Compile Include="StateMachines\Transition.cs" />
+    <Compile Include="StateMachines\TransitState.cs" />
+    <None Include="Shaders\ImageShaderBase.pdxsl">
+      <Generator>ParadoxShaderKeyGenerator</Generator>
+      <LastGenOutput>ImageShaderBase.cs</LastGenOutput>
+    </None>
+    <Compile Include="Utilities\MathUtilities.cs" />
+    <Compile Include="Utilities\RandomExtensions.cs" />
+    <Compile Include="Utilities\SerializationStreamExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="$(SiliconStudioPackageProps)" Condition="Exists('$(SiliconStudioPackageProps)')" />
+  <Import Project="$(SiliconStudioParadoxDir)\Targets\SiliconStudio.Common.targets" Condition="Exists('$(SiliconStudioParadoxDir)\Targets\SiliconStudio.Common.targets')" />
+  <Target Name="EnsureSiliconStudioParadoxInstalled" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(SiliconStudioParadoxDir)' == ''" Text="Paradox SDK was not found. Check Paradox is installed and the global env variable [SiliconStudioParadoxDir] is setup correctly" />
+    <Error Condition="!Exists('$(SiliconStudioParadoxDir)\Targets\SiliconStudio.Common.targets')" Text="Invalid Paradox SDK installation. Target file [$(SiliconStudioParadoxDir)\Targets\SiliconStudio.Common.targets] was not found." />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+    Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

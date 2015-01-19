@@ -1,0 +1,13 @@
+﻿class ComputeColorTiled<Texture2DArray TTexture> : Texturing, ComputeColor
+{
+    stage stream float3 TileTexCoord;
+    stage stream float3 ParentTexCoord;
+    stage stream float3 MorphAmount;
+
+    override float4 Compute()
+    {
+        float4 high = TTexture.SampleLevel(LinearSampler, streams.TileTexCoord, 0);
+        float4 low = TTexture.SampleLevel(LinearSampler, streams.ParentTexCoord, 0);
+        return lerp(high, low, streams.MorphAmount);
+    }
+};

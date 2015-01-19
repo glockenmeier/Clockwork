@@ -1,0 +1,11 @@
+﻿class TerrainTileParameter: TerrainTileBase
+{
+    // TODO: cbuffer PerObject
+    [Link("TerrainRenderer.TileInfo")]
+    TerrainTileInfo TileInfo;
+
+    TerrainTileInfo GetTileInfo()
+    {
+        return TileInfo;
+    }
+};

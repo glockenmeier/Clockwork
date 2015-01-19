@@ -1,0 +1,10 @@
+!Terrain
+Id: 06b82972-fc1c-439a-b094-da9bf616b438
+Tags: []
+Source: ../../RawAssets/heightmap.png
+VerticesPerPatch: 67
+Layers:
+    -   Opacity: ../../RawAssets/grass_opacity.png
+        Material: ab5a3834-e6ab-46f6-af5d-38e19a2f3fb9:grass_material
+    -   Opacity: ../../RawAssets/mountain_opacity.png
+        Material: 3724db52-70d7-4ffa-a3c0-ea493dd38970:mountain_material

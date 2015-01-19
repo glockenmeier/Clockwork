@@ -1,0 +1,51 @@
+﻿class TerrainNormalMap : /*TangentToViewBase, */TerrainBase, NormalVSBase
+{
+    override void GenerateNormalVS_PS()
+    {
+        base.GenerateNormalVS_PS();
+
+        TerrainTileInfo tile = GetTileInfo();
+
+        float lateralOffset = TwoTexelSizeOverHeightScale * tile.Scale;
+        float3 normal = SampleNormal(streams.TileTexCoord.xy, lateralOffset, tile.TextureIndex);
+        float3 parentNormal = SampleNormal(streams.ParentTexCoord.xy, lateralOffset * 2, tile.ParentTextureIndex);
+
+        streams.vNormal = normalize(lerp(normal, parentNormal, streams.MorphAmount));
+        streams.vTangent = float4(normalize(float3(1, 0, 0) - streams.vNormal * streams.vNormal.x), 1);
+        streams.vNormalVS = mul((float3x3)Transformation.WorldViewInverse, streams.vNormal);
+    }
+
+    float3 SampleNormal(float2 texCoord, float twoTexelWorldSize, float slice)
+    {   
+        float w = SampleHeight(float3(texCoord + float2(-TexelSize, 0), slice)).x;
+        float e = SampleHeight(float3(texCoord + float2(TexelSize, 0), slice)).x;
+        float n = SampleHeight(float3(texCoord + float2(0, -TexelSize), slice)).x;
+        float s = SampleHeight(float3(texCoord + float2(0, TexelSize), slice)).x;
+
+        float3 v = float3(0, (s - n), twoTexelWorldSize);
+        float3 h = float3(twoTexelWorldSize, (e - w), 0);
+        return cross(v, h);
+    }
+
+    /*float3 SampleNormal(float2 texCoord, float twoTexelWorldSize, float slice)
+    {
+        float4x4 heights;
+        heights._m10_m11_m01_m00 = HeightMap.Gather(HeightMapSampler, float3(texCoord, slice), int2(-1, -1));
+        heights._m12_m13_m03_m02 = HeightMap.Gather(HeightMapSampler, float3(texCoord, slice), int2(1, -1));
+        heights._m30_m31_m21_m20 = HeightMap.Gather(HeightMapSampler, float3(texCoord, slice), int2(-1, 1));
+        heights._m32_m33_m23_m22 = HeightMap.Gather(HeightMapSampler, float3(texCoord, slice), int2(1, 1));
+
+        float2 amount =  frac(texCoord.xy / TexelSize - 0.5);
+        return CalculateNormal(heights, twoTexelWorldSize, amount);
+    }
+
+    float3 CalculateNormal(float4x4 heights, float twoTexelWorldSize, float2 amount)
+    {
+        float3 n0 = cross(float3(0, (heights._m21 - heights._m01), twoTexelWorldSize), float3(twoTexelWorldSize, (heights._m12 - heights._m10), 0));
+        float3 n1 = cross(float3(0, (heights._m22 - heights._m02), twoTexelWorldSize), float3(twoTexelWorldSize, (heights._m13 - heights._m11), 0));
+        float3 n2 = cross(float3(0, (heights._m31 - heights._m11), twoTexelWorldSize), float3(twoTexelWorldSize, (heights._m22 - heights._m20), 0));
+        float3 n3 = cross(float3(0, (heights._m32 - heights._m12), twoTexelWorldSize), float3(twoTexelWorldSize, (heights._m23 - heights._m21), 0));
+
+        return lerp(lerp(n0, n1, amount.x), lerp(n2, n3, amount.x), amount.y);
+    }*/
+};

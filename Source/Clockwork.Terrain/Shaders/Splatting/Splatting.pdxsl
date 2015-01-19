@@ -1,0 +1,43 @@
+﻿class Splatting : SplattingBase, TerrainBase, NormalVSBase, ShadingBase
+{
+    Texture2DArray BlendMap;
+
+    float2 BlendMapIndices[SPLATTING_BLEND_COUNT]; // make float4 and use to address channel?
+    
+    // Will not be called in the GBuffer pass
+    override stage float4 Shading()
+    {
+        CalculateSplattingWeights();
+        return base.Shading();
+    }
+
+    // Will be be overriden in deferred pass
+    override stage void GenerateNormalVS_PS()
+    {
+        base.GenerateNormalVS_PS();
+        CalculateSplattingWeights();
+    }
+
+    // TODO: Find better solution to calculate weights in all effects. Check where this needs to be called in forward rendering.       
+    stage void CalculateSplattingWeights()
+    {
+        float totalWeight = 0;
+
+        for (uint i = 0; i < SPLATTING_BLEND_COUNT; i++)
+        {
+            //float2 indices = BlendMapIndices[i];
+            //float weight = BlendMap.SampleLevel(Texturing.LinearSampler, float3(streams.TileTexCoord.xy, indices.x), 0).x;
+            //float parentWeight = BlendMap.SampleLevel(Texturing.LinearSampler, float3(streams.ParentTexCoord.xy, indices.y), 0).x;
+
+            float weight = BlendMap.SampleLevel(Texturing.LinearSampler, streams.TileTexCoord, 0).x;
+            float parentWeight = BlendMap.SampleLevel(Texturing.LinearSampler, streams.ParentTexCoord, 0).x;
+            weight = lerp(weight, parentWeight, streams.MorphAmount);
+
+            if (i == SPLATTING_BLEND_COUNT - 1)
+                weight = 1 - totalWeight;
+
+            SetWeight(i, weight);
+            totalWeight += weight;
+        }
+    }
+};

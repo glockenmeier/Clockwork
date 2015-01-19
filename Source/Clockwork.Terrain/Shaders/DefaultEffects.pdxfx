@@ -1,0 +1,120 @@
+﻿using SiliconStudio.Paradox.Effects.Data;
+
+namespace Clockwork.Terrain.Shaders
+{
+    params TerrainParameters
+    {
+        bool UseInstancing;
+        bool UseQuadTriangulation = true;
+    };
+
+    shader MorphDebugging
+    {
+        mixin clone;
+        mixin MorphDebugShading;
+    };
+
+    shader DefaultDeferredTerrainEffect
+    {
+        using params TerrainParameters;
+
+        // Basics
+        mixin TerrainBase;
+        mixin PositionVSStream;
+        //mixin NormalVSStream;
+        mixin TerrainNormalMap;
+        mixin SplattingEffect;
+        //mixin SimulateSplatNormals;
+
+        // Splatting
+
+        // Technique
+        if (TerrainParameters.UseQuadTriangulation)
+            mixin TerrainQuadTriangulation;
+
+        if (TerrainParameters.UseInstancing)
+            mixin TerrainTileInstanced;
+        else
+            mixin TerrainTileParameter;
+
+        // Children
+        mixin ParadoxGBufferPlugin;
+        
+        mixin LightDeferredShading;
+
+        mixin child ShadowMapCaster;
+
+        mixin child MorphDebugging;
+    };
+
+    partial shader SplattingEffect
+    {
+        using params SplattingParameters;
+        mixin macro SPLATTING_BLEND_COUNT = SplattingParameters.MaterialCount;
+        mixin Splatting;
+
+        mixin AlbedoDiffuseBase;
+        mixin compose albedoDiffuse = AlbedoDiffuseSplatted;
+
+        mixin AlbedoSpecularBase;
+        mixin compose albedoSpecular = AlbedoSpecularSplatted;
+
+        mixin NormalMapTexture;
+        mixin compose normalMap = NormalMapSplatted;
+/*
+        mixin AlbedoSpecularBase;
+        mixin compose albedoSpecular = AlbedoDiffuseSplatted;
+
+        mixin SpecularPower;
+        mixin compose SpecularPowerMap = MaterialParameters.SpecularPowerMap;
+*/
+    };
+
+    partial shader AlbedoDiffuseSplatted
+    {
+        using params SplattingParameters;
+        using params MaterialParameters;
+
+        mixin ComputeColorSplatted;
+        
+        foreach (params SplattingParameters.Materials)
+        {
+            if (MaterialParameters.AlbedoDiffuse != null)
+                mixin compose Layers += MaterialParameters.AlbedoDiffuse;
+            else 
+                mixin compose Layers += ComputeColor;
+        }
+    };
+
+    partial shader AlbedoSpecularSplatted
+    {
+        using params SplattingParameters;
+        using params MaterialParameters;
+
+        mixin ComputeColorSplatted;
+        
+        foreach (params SplattingParameters.Materials)
+        {
+            if (MaterialParameters.AlbedoSpecular != null)
+                mixin compose Layers += MaterialParameters.AlbedoSpecular;
+            else 
+                mixin compose Layers += ComputeColor;
+        }
+    };
+
+    partial shader NormalMapSplatted
+    {
+        using params SplattingParameters;
+        using params MaterialParameters;
+
+        mixin ComputeColorSplatted;
+        
+        foreach (params SplattingParameters.Materials)
+        {
+            if (MaterialParameters.NormalMap != null)
+                mixin compose Layers += MaterialParameters.NormalMap;
+            else 
+                mixin compose Layers += ComputeColorNormalFlat;
+        }
+    };
+}

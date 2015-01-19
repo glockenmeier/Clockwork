@@ -1,0 +1,90 @@
+﻿class TerrainBase : Texturing, NormalStream, TerrainTileBase, TransformationWVP
+{	
+    // Global
+    Texture2DArray HeightMap;
+    SamplerState HeightMapSampler;
+
+    Texture2DArray ColorMap;
+    stream float3 Color;
+
+    float HeightScale;
+    float TexelSize;
+    float TwoTexelSizeOverHeightScale;
+    float RelativeMarginWidth;
+    float RelativeEffectivePatchSize;
+
+    float HalfTesselation;
+    float TwoOverTesselation;
+    float2 MorphConsts[15];
+
+    // Vertex
+    stream float2 Position2;
+
+    // Pixel attributes
+    stream float3 TileTexCoord;
+    stream float3 ParentTexCoord;
+    stream float MorphAmount;
+
+    stage override void VSMain()
+    {
+        TerrainTileInfo tile = GetTileInfo();
+
+        streams.Position2 = streams.Position.xy;
+
+        // Arrange the input grid and sample a first height estimate;
+        // This is needed, so morphing doesn't break down when viewing from above/below,
+        float3 position;
+        position.xz = streams.Position2 * tile.Scale + tile.Offset;
+        position.y = SampleHeight(float3(streams.Position2 * RelativeEffectivePatchSize + RelativeMarginWidth, tile.TextureIndex)) * HeightScale;
+        
+        // Calculate the amount by which the current patch should be blended towards a lower resolution.
+        float eyeDistance = distance(position, Transformation.Eye);
+        float morphAmount = 1 - saturate(MorphConsts[tile.Level].x - eyeDistance * MorphConsts[tile.Level].y);
+
+        // Get the actual morphed position and texture coordinates.
+        float2 morphedPosition = MorphVertex(streams.Position2, morphAmount);
+        float2 texCoord = morphedPosition * RelativeEffectivePatchSize;
+        float2 parentTexCoord = texCoord / 2 + tile.OffsetToParent;
+        texCoord += RelativeMarginWidth;
+        position.xz = morphedPosition * tile.Scale + tile.Offset;
+
+        // Color
+        streams.Color = ColorMap.SampleLevel(Texturing.LinearSampler, float3(texCoord, tile.TextureIndex), 0).rgb;
+
+        // Sample the height at the final position, and blend between the current and the next lower resolution.
+        float height = SampleHeight(float3(texCoord, tile.TextureIndex));
+        float parentHeight = SampleHeight(float3(parentTexCoord, tile.ParentTextureIndex));
+        position.y = lerp(height, parentHeight, morphAmount) * HeightScale;
+
+        streams.TexCoord = morphedPosition * tile.Scale;
+        streams.Position = float4(position, 1);
+        streams.vNormal = 0; // TODO: ParadoxGBufferPlugin needs this to be defined. Fix?
+
+        // Texture interpolation
+        streams.TileTexCoord = float3(texCoord, tile.TextureIndex); //float3(morphedPosition, tile.TextureIndex);
+        streams.ParentTexCoord = float3(parentTexCoord, tile.ParentTextureIndex); //float3(morphedPosition / 2 + tile.OffsetToParent, tile.ParentTextureIndex);
+        streams.MorphAmount = morphAmount;
+
+        base.VSMain();
+    }
+
+    // Transforms a vertex of a tessellated unit patch based on a morphAmount in [0, 1], gradually cutting tessellation in half.
+    // Odd vertices are uneffected, while even vertices are morphed towards the previous odd one.
+    float2 MorphVertex(float2 position, float morphAmount)
+    {
+        float2 fracPart = frac(position * HalfTesselation) * TwoOverTesselation;
+        return position - fracPart * morphAmount;
+    }
+
+    float SampleHeight(float3 texCoord)
+    {
+        float4 encodedHeight = HeightMap.SampleLevel(HeightMapSampler, texCoord, 0);
+        return encodedHeight.x;
+
+        // BC5
+        //return (encodedHeight.y * 254 + encodedHeight.x) / 255;
+
+        // BC1
+        //return (encodedHeight.z * 30 + (encodedHeight.y * 62 + encodedHeight.y) / 63) / 31;
+    }
+};

@@ -1,0 +1,49 @@
+!Package
+Id: 34c6ea10-ce17-4453-b8d9-822c8aab4dd9
+Tags: []
+Meta:
+    Name: Terrain
+    Version: 1.0.0.0
+    Authors: []
+    Owners: []
+    Dependencies:
+        -   Name: Paradox
+            Version: 1.0.0-alpha01
+LocalDependencies:
+    - 7049d18b-dbb8-41e7-be49-ba73262b86c0:../../Clockwork.pdxpkg
+Profiles:
+    -   Name: Shared
+        Platform: Shared
+        InheritProfiles: []
+        AssetFolders:
+            -   Path: Assets/Shared
+                RawImports: []
+            -   Path: Terrain.Game/Effects
+                RawImports: []
+        OutputGroupDirectories: {}
+        Properties:
+            Paradox.DisplayOrientation: !DisplayOrientation LandscapeRight
+        ProjectReferences:
+            -   Id: 235879a2-3be3-4779-a075-171a66253758
+                Location: Terrain.Game/Terrain.Game.csproj
+                Type: Library
+            -   Id: 18331cc2-a45e-4715-a22a-6c7ef4f3493b
+                Location: ../../Source/Clockwork.Compiler/Clockwork.Compiler.csproj
+                Type: Library				
+    -   Name: Windows
+        Platform: Windows
+        InheritProfiles: []
+        AssetFolders:
+            -   Path: Assets/Windows
+                RawImports: []			
+        OutputGroupDirectories: {}
+        Properties:
+            Paradox.GraphicsPlatform: !GraphicsPlatform Direct3D11
+            Paradox.GraphicsProfile: !GraphicsProfile Level_10_1
+        ProjectReferences:
+            -   Id: 39ae064b-8c0e-47c3-8c57-054ad952350a
+                Location: Terrain.Windows/Terrain.Windows.csproj
+                Type: Executable
+ExplicitFolders: []
+Bundles: []
+TemplateFolders: []

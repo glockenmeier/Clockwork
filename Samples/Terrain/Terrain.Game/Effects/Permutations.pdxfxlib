@@ -1,0 +1,22 @@
+!EffectLibrary
+Id: d1841005-79ea-4aac-a8b9-4a75cf9eac0e
+BuildOrder: 1000
+Tags: []
+Permutations:
+    Keys: {}
+    Children:
+        -   Keys:
+                Effect.Name: TerrainEffect
+                MaterialAsset.UseParameters: true
+                Mesh.UseParameters: true
+                RenderingParameters.UseDeferred: true
+            Children: []
+        -   Keys:
+                Effect.Name: TerrainEffect
+                ShadowMapParameters.FilterType:
+                    - !ShadowMapFilterType Nearest
+                    - !ShadowMapFilterType PercentageCloserFiltering
+                ShadowMapParameters.ShadowMapCascadeCount: !fxparam.range
+                    From: 1
+                    To: 4
+            Children: []

@@ -1,0 +1,17 @@
+﻿#ifndef SPLATTING_BLEND_COUNT
+# define SPLATTING_BLEND_COUNT 1
+#endif
+class SplattingBase
+{
+    stage stream float SplattingWeights[SPLATTING_BLEND_COUNT];
+
+    stage float GetWeight(int index)
+    {
+        return streams.SplattingWeights[index];
+    }
+
+    stage void SetWeight(int index, float value)
+    {
+        streams.SplattingWeights[index] = value;
+    }
+};

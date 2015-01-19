@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{18331CC2-A45E-4715-A22A-6C7EF4F3493B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Clockwork.Compiler</RootNamespace>
+    <AssemblyName>Clockwork.Compiler</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <!--ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids-->
+    <!--TargetFrameworkProfile>Profile111</TargetFrameworkProfile-->
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <PlatformTarget>x86</PlatformTarget>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup>
+    <SiliconStudioCurrentPackagePath>$(MSBuildThisFileDirectory)..\..\Clockwork.pdxpkg</SiliconStudioCurrentPackagePath>
+    <SiliconStudioPackageProps>$([System.IO.Path]::ChangeExtension('$(SiliconStudioCurrentPackagePath)', '.props'))</SiliconStudioPackageProps>
+    <SiliconStudioProjectType>Library</SiliconStudioProjectType>
+    <SiliconStudioPlatform>Windows</SiliconStudioPlatform>
+    <SiliconStudioParadoxGraphicsApi>Direct3D11</SiliconStudioParadoxGraphicsApi>
+    <SiliconStudioBuildProfile>Windows</SiliconStudioBuildProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE;SILICONSTUDIO_PLATFORM_WINDOWS;SILICONSTUDIO_PLATFORM_WINDOWS_DESKTOP</DefineConstants>
+    <OutputPath>..\Bin\Windows-Direct3D11\Debug\</OutputPath>
+    <IntermediateOutputPath>obj\Windows\Debug\</IntermediateOutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;SILICONSTUDIO_PLATFORM_WINDOWS;SILICONSTUDIO_PLATFORM_WINDOWS_DESKTOP</DefineConstants>
+    <OutputPath>..\Bin\Windows-Direct3D11\Release\</OutputPath>
+    <IntermediateOutputPath>obj\Windows\Release\</IntermediateOutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Terrain\ImageTreeBuilderContext.cs" />
+    <Compile Include="Terrain\TerrainLayer.cs" />
+    <Compile Include="Module.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Terrain\MaterialTreeBuilder.cs" />
+    <Compile Include="Terrain\HeightMapTreeBuilder.cs" />
+    <Compile Include="Terrain\IImageSource.cs" />
+    <Compile Include="Terrain\ImageTreeBuilder.cs" />
+    <Compile Include="Terrain\TerrainAssetCompiler.cs" />
+    <Compile Include="Terrain\TerrainAsset.cs" />
+    <Compile Include="Terrain\TerrainMetrics.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!--Reference Include="SiliconStudio.Paradox.Importer.FBX">
+      <HintPath>$(SiliconStudioPackageParadoxSdkBin)\SiliconStudio.Paradox.Importer.FBX.dll</HintPath>
+    </Reference>
+	    <Reference Include="SiliconStudio.Paradox.Importer.Assimp">
+      <HintPath>$(SiliconStudioPackageParadoxSdkBin)\SiliconStudio.Paradox.Importer.Assimp.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Paradox.Importer.Common">
+      <HintPath>$(SiliconStudioPackageParadoxSdkBin)\SiliconStudio.Paradox.Importer.Common.dll</HintPath>
+    </Reference-->
+    <Reference Include="SharpYaml">
+      <HintPath>$(SiliconStudioPackageParadoxSdkBin)\SharpYaml.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Assets">
+      <HintPath>$(SiliconStudioPackageParadoxSdkBin)\SiliconStudio.Assets.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Paradox.Assets">
+      <HintPath>$(SiliconStudioPackageParadoxSdkBin)\SiliconStudio.Paradox.Assets.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.BuildEngine.Common">
+      <HintPath>$(SiliconStudioPackageParadoxSdkBin)\SiliconStudio.BuildEngine.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.BuildEngine.Paradox.FBX">
+      <HintPath>$(SiliconStudioPackageParadoxSdkBin)\SiliconStudio.BuildEngine.Paradox.FBX.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.Core.Design">
+      <HintPath>$(SiliconStudioPackageParadoxSdkBin)\SiliconStudio.Core.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="SiliconStudio.TextureConverter">
+      <HintPath>$(SiliconStudioPackageParadoxSdkBin)\SiliconStudio.TextureConverter.exe</HintPath>
+    </Reference>
+    <Reference Include="FreeImageNET">
+      <HintPath>$(SiliconStudioPackageParadoxSdkBin)\FreeImageNET.dll</HintPath>
+      <Aliases>global,FreeImageNET</Aliases>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Speech" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Clockwork.Atmosphere\Clockwork.Atmosphere.csproj">
+      <Project>{8c442be5-cf62-4d37-9116-28018009dfeb}</Project>
+      <Name>Clockwork.Atmosphere</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Clockwork.Core\Clockwork.Core.csproj">
+      <Project>{70e06aaf-48b2-4e0e-82db-59092188a40f}</Project>
+      <Name>Clockwork.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Clockwork.Terrain\Clockwork.Terrain.csproj">
+      <Project>{fdd55244-b199-41db-85c2-820cb06a3428}</Project>
+      <Name>Clockwork.Terrain</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SiliconStudioPackageProps)" Condition="Exists('$(SiliconStudioPackageProps)')" />
+  <Import Project="$(SiliconStudioParadoxDir)\Targets\SiliconStudio.Common.targets" Condition="Exists('$(SiliconStudioParadoxDir)\Targets\SiliconStudio.Common.targets')" />
+  <Target Name="EnsureSiliconStudioParadoxInstalled" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(SiliconStudioParadoxDir)' == ''" Text="Paradox SDK was not found. Check Paradox is installed and the global env variable [SiliconStudioParadoxDir] is setup correctly" />
+    <Error Condition="!Exists('$(SiliconStudioParadoxDir)\Targets\SiliconStudio.Common.targets')" Text="Invalid Paradox SDK installation. Target file [$(SiliconStudioParadoxDir)\Targets\SiliconStudio.Common.targets] was not found." />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+    Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,18 @@
+!MaterialAsset
+Id: ab5a3834-e6ab-46f6-af5d-38e19a2f3fb9
+BuildOrder: 250
+Tags: []
+Material:
+    Nodes:
+        Diffuse: !MaterialTextureNode
+            TextureReference: 82f62a4f-6091-450e-bb34-16c3fa5f054b:grass
+            Filtering: Anisotropic
+            Scale: {X: 0.25, Y: 0.25}
+            Offset: {X: 0, Y: 0}
+            AutoAssignKey: false
+            Key: Texturing.Texture0
+    ColorNodes:
+        MaterialParameters.AlbedoDiffuse: Diffuse
+    Parameters:
+        Capacity: 0
+        ~Items: {}

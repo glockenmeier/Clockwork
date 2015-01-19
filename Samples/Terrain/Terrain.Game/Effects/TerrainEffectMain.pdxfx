@@ -1,0 +1,31 @@
+﻿using SiliconStudio.Paradox.Effects.Data;
+
+namespace Terrain.Effects
+{
+    params TerrainMaterialParameters
+    {
+        bool HasPreTransform;
+    };
+
+    shader TerrainPrepassEffect
+    {
+        mixin ParadoxDefaultLightPrepassEffect;
+    };
+
+    shader TerrainEffect
+    {
+        using params TerrainMaterialParameters;
+
+        if (TerrainMaterialParameters.HasPreTransform)
+        {
+            mixin PreTransformation;
+        }
+
+        mixin ParadoxDefaultDeferredShader;
+    };
+
+    shader TerrainTerrainEffect
+    {
+        mixin DefaultDeferredTerrainEffect;
+    };
+}

@@ -1,0 +1,4 @@
+
+[submodule "Deps/BEPUphysics"]
+	path = Deps/BEPUphysics
+	url = https://github.com/jwollen/BEPUphysics-Paradox.git

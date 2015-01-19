@@ -1,0 +1,23 @@
+﻿class TerrainTileInstanced : TerrainTileBase
+{
+    stream float2 Offset : OFFSET;
+    stream float2 OffsetToParent : PARENT_OFFSET; 
+    stream float Scale : SCALE;
+    stream float Level : LEVEL;
+    stream float TextureIndex : INDEX;
+    stream float ParentTextureIndex : PARENT_INDEX;
+
+    TerrainTileInfo GetTileInfo()
+    {
+        TerrainTileInfo info;
+
+        info.Offset = Offset;
+        info.OffsetToParent = OffsetToParent;
+        info.Scale = Scale;
+        info.Level = Level;
+        info.TextureIndex = TextureIndex;
+        info.ParentTextureIndex = ParentTextureIndex;
+
+        return info;
+    }
+};

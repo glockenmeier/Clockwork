@@ -1,0 +1,44 @@
+﻿class TerrainQuadTriangulation : ShaderBase, /*NormalStream, */PositionStream
+{
+    stage stream uint VertexID : SV_VertexID;
+    
+    stream uint PassThroughVertexID;
+
+    override stage void VSMain()
+    {
+        base.VSMain();
+        streams.PassThroughVertexID = streams.VertexID;
+    }
+
+    [maxvertexcount(4)]
+    void GSMain(lineadj Input input[4], inout TriangleStream<Output> triangleStream)
+    {
+        // Lines have odd numbers of vertices, so they start with alternating VertexID parity.
+        // Therefore, vertices of quad diagonals will always have the same parity.
+        if (input[1].PassThroughVertexID % 2 == input[2].PassThroughVertexID % 2)
+        {
+            //float a1 = dot(input[1].vNormal.xyz, input[2].vNormal.xyz);
+            //float a2 = dot(input[0].vNormal.xyz, input[3].vNormal.xyz);
+
+            float a2 = abs(input[1].Position.y - input[2].Position.y);
+            float a1 = abs(input[0].Position.y - input[3].Position.y);
+
+            if (a1 > a2)
+            {
+                streams = input[0]; triangleStream.Append(streams);
+                streams = input[1]; triangleStream.Append(streams);
+                streams = input[2]; triangleStream.Append(streams);
+                streams = input[3]; triangleStream.Append(streams);
+            }
+            else
+            {
+                streams = input[2]; triangleStream.Append(streams);
+                streams = input[0]; triangleStream.Append(streams);
+                streams = input[3]; triangleStream.Append(streams);
+                streams = input[1]; triangleStream.Append(streams);
+            }
+
+            triangleStream.RestartStrip();
+        }
+    }
+};

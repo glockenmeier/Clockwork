@@ -1,0 +1,56 @@
+!Package
+Id: 7049d18b-dbb8-41e7-be49-ba73262b86c0
+Tags: []
+Meta:
+    Name: Clockwork
+    Version: 1.0.0.0
+    Authors: []
+    Owners: []
+    Dependencies:
+        -   Name: Paradox
+            Version: 1.0.0-alpha10
+LocalDependencies: []
+Profiles:
+    -   Name: Shared
+        Platform: Shared
+        InheritProfiles: []
+        AssetFolders:
+            -   Path: Source/Clockwork.Atmosphere/Shaders
+                RawImports: []
+            -   Path: Source/Clockwork.Terrain/Shaders
+                RawImports: []
+            -   Path: Source/Clockwork.Core/Shaders
+                RawImports: []
+        OutputGroupDirectories: {}
+        Properties: {}
+        ProjectReferences:
+            -   Id: 70e06aaf-48b2-4e0e-82db-59092188a40f
+                Location: Source/Clockwork.Core/Clockwork.Core.csproj
+                Type: Library
+            -   Id: 2605EBCC-1B34-41BA-98CF-F188177AE24A
+                Location: Source/Clockwork.Games/Clockwork.Games.csproj
+                Type: Library				
+            -   Id: eb0b9069-04f9-4179-9515-bc6c873e945e
+                Location: Source/Clockwork.Physics/Clockwork.Physics.csproj
+                Type: Library
+            -   Id: FDD55244-B199-41DB-85C2-820CB06A3428
+                Location: Source/Clockwork.Terrain/Clockwork.Terrain.csproj
+                Type: Library
+            -   Id: 8C442BE5-CF62-4D37-9116-28018009DFEB
+                Location: Source/Clockwork.Atmosphere/Clockwork.Atmosphere.csproj
+                Type: Library				
+            -   Id: 18331cc2-a45e-4715-a22a-6c7ef4f3493b
+                Location: Source/Clockwork.Compiler/Clockwork.Compiler.csproj
+                Type: Library
+    -   Name: Windows
+        Platform: Windows
+        InheritProfiles: []
+        AssetFolders: []
+        OutputGroupDirectories: {}
+        Properties:
+            Paradox.GraphicsPlatform: !GraphicsPlatform Direct3D11
+            Paradox.GraphicsProfile: !GraphicsProfile Level_10_1
+        ProjectReferences: []
+ExplicitFolders: []
+Bundles: []
+TemplateFolders: []
