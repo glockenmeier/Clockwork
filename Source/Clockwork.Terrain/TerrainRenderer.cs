@@ -12,6 +12,7 @@ namespace Clockwork.Terrain
 
         private Effect effect;
         private TerrainModel terrain;
+        private ParameterCollection parameters = new ParameterCollection();
 
         public TerrainRenderer(IServiceRegistry services, string effectName, TerrainModel terrain)
             : base(services)
@@ -20,7 +21,6 @@ namespace Clockwork.Terrain
 
             int maxBlendCount = terrain.Content.Description.Materials.Count;
             var materialParams = new ShaderMixinParameters[maxBlendCount];
-            var effectParams = new ParameterCollection();
 
             for (int i = 0; i < maxBlendCount; i++)
             {
@@ -31,7 +31,7 @@ namespace Clockwork.Terrain
                     if (parameter.Key.PropertyType == typeof(Texture) ||
                         parameter.Key.PropertyType == typeof(SamplerState))
                     {
-                        effectParams.SetObject(parameter.Key, parameter.Value);
+                        parameters.SetObject(parameter.Key, parameter.Value);
                     }
                     else
                     {
@@ -47,7 +47,6 @@ namespace Clockwork.Terrain
             compilerParameters.Set(SplattingParameters.Materials, materialParams);
 
             effect = EffectSystem.LoadEffect(effectName, compilerParameters);
-            effectParams.CopyTo(effect.Parameters);
         }
 
         public override void Load()
@@ -60,7 +59,7 @@ namespace Clockwork.Terrain
             if (terrain == null)
                 return;
 
-            terrain.Draw(renderContext, effect);
+            terrain.Draw(renderContext, effect, parameters);
         }
 
         public override void Unload()

@@ -2,7 +2,7 @@
 
 class InscatterBase : VolumeShaderBase, AtmospherePrecomputation
 {
-    stage stream float4 Constants; // dHdh
+    stage stream float4 Consts; // dHdh
     stage stream float Altitude;
 
     override void ProcessSlice()
@@ -18,10 +18,10 @@ class InscatterBase : VolumeShaderBase, AtmospherePrecomputation
         float altitudeSquared = altitude * altitude;
 
         streams.TexCoordZ = ((float)slice + 0.5) / AltitudeResolution;
-        streams.Constants.x = TopHeight - altitude;
-        streams.Constants.y = sqrt(altitudeSquared - groundSquared) + sqrt(topSquared - groundSquared);
-        streams.Constants.z = altitude - GroundHeight;
-        streams.Constants.w = sqrt(altitudeSquared - groundSquared);
+        streams.Consts.x = TopHeight - altitude;
+        streams.Consts.y = sqrt(altitudeSquared - groundSquared) + sqrt(topSquared - groundSquared);
+        streams.Consts.z = altitude - GroundHeight;
+        streams.Consts.w = sqrt(altitudeSquared - groundSquared);
         streams.Altitude = altitude;
     }
 
@@ -30,7 +30,7 @@ class InscatterBase : VolumeShaderBase, AtmospherePrecomputation
         base.PSMain();
 
         float viewZenith, sunZenith, viewSun;
-        GetInscatterParams(streams.TexCoord, streams.Constants, streams.Altitude, viewZenith, sunZenith, viewSun);
+        GetInscatterParams(streams.TexCoord, streams.Consts, streams.Altitude, viewZenith, sunZenith, viewSun);
         streams.ColorTarget = Compute(streams.Altitude, viewZenith, sunZenith, viewSun);
     }
 

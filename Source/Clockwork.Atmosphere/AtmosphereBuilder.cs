@@ -2,7 +2,6 @@
 using SiliconStudio.Core.IO;
 using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Paradox.Effects;
-using SiliconStudio.Paradox.Effects.Modules;
 using SiliconStudio.Paradox.Graphics;
 
 namespace Clockwork.Atmosphere
@@ -11,12 +10,10 @@ namespace Clockwork.Atmosphere
     public class AtmosphereBuilder : ComponentBase
     {
         private BlendState blendState;
-        private Effect computeTransmittance, computeSingleIrradiance, computeMultipleIrradiance, copySingleIrradiance;
+        private Effect computeTransmittance, computeSingleIrradiance, computeMultipleIrradiance;
         private Effect computeSingleInscatter, computeMultipleInscatter, computeOutscatter, copySingleInscatter, copyMultipleInscatter;
         private Effect copySlice;
-        private Texture2D deltaE;
-        private Texture3D deltaSM, deltaSR, deltaJ;
-        private RenderTarget deltaETarget, deltaSMTarget, deltaSRTarget, deltaJTarget, transmittanceTarget, irradianceTarget, inscatterTarget;
+        private Texture deltaE, deltaSM, deltaSR, deltaJ;
         private ParameterCollection parameters = new ParameterCollection();
 
         public AtmosphereData Data { get; set; }
@@ -41,18 +38,10 @@ namespace Clockwork.Atmosphere
             var intermediateInscatter = Texture3D.New(device, intermediateInscatterDesc).DisposeBy(this);
  */
 
-            transmittanceTarget = Data.Transmittance.ToRenderTarget().DisposeBy(this);
-            irradianceTarget = Data.Irradiance.ToRenderTarget().DisposeBy(this);
-            inscatterTarget = Data.Inscatter.ToRenderTarget(ViewType.Full, 0, 0).DisposeBy(this);
-
-            deltaE = Texture2D.New(device, Data.Irradiance.Description).DisposeBy(this);
-            deltaSM = Texture3D.New(device, Data.Inscatter.Description).DisposeBy(this);
-            deltaSR = Texture3D.New(device, Data.Inscatter.Description).DisposeBy(this);
-            deltaJ = Texture3D.New(device, Data.Inscatter.Description).DisposeBy(this);
-            deltaETarget = deltaE.ToRenderTarget().DisposeBy(this);
-            deltaSMTarget = deltaSM.ToRenderTarget(ViewType.Full, 0, 0).DisposeBy(this);
-            deltaSRTarget = deltaSR.ToRenderTarget(ViewType.Full, 0, 0).DisposeBy(this);
-            deltaJTarget = deltaJ.ToRenderTarget(ViewType.Full, 0, 0).DisposeBy(this);
+            deltaE = Texture.New(device, Data.Irradiance.Description).DisposeBy(this);
+            deltaSM = Texture.New(device, Data.Inscatter.Description).DisposeBy(this);
+            deltaSR = Texture.New(device, Data.Inscatter.Description).DisposeBy(this);
+            deltaJ = Texture.New(device, Data.Inscatter.Description).DisposeBy(this);
 
             computeTransmittance = effectSystem.LoadEffect("ComputeTransmittance");
             computeSingleIrradiance = effectSystem.LoadEffect("SingleIrradiance");
@@ -97,42 +86,42 @@ namespace Clockwork.Atmosphere
 
         public void Generate(GraphicsDevice device)
         {
-            Draw(device, computeTransmittance, transmittanceTarget);
+            Draw(device, computeTransmittance, Data.Transmittance);
 
-            Draw(device, computeSingleIrradiance, deltaETarget);
+            Draw(device, computeSingleIrradiance, deltaE);
 
-            DrawSlices(device, computeSingleInscatter, deltaSRTarget, deltaSMTarget);
+            DrawSlices(device, computeSingleInscatter, deltaSR, deltaSM);
 
-            device.Clear(irradianceTarget, Color.Black);
+            device.Clear(Data.Irradiance, Color.Black);
             
-            DrawSlices(device, copySingleInscatter, inscatterTarget);
+            DrawSlices(device, copySingleInscatter, Data.Inscatter);
 
             for (int order = 2; order <= 4; order++)
             {
                 parameters.Set(AtmospherePrecomputationKeys.IsFirst, order == 2);
 
-                DrawSlices(device, computeOutscatter, deltaJTarget);
-                Draw(device, computeMultipleIrradiance, deltaETarget);
-                DrawSlices(device, computeMultipleInscatter, deltaSRTarget);
+                DrawSlices(device, computeOutscatter, deltaJ);
+                Draw(device, computeMultipleIrradiance, deltaE);
+                DrawSlices(device, computeMultipleInscatter, deltaSR);
 
                 device.SetBlendState(blendState);
                 {
-                    device.SetRenderTarget(irradianceTarget);
+                    device.SetRenderTarget(Data.Irradiance);
                     device.DrawTexture(deltaE, device.SamplerStates.PointClamp); 
-                    DrawSlices(device, copyMultipleInscatter, inscatterTarget); 
+                    DrawSlices(device, copyMultipleInscatter, Data.Inscatter); 
                 }
                 device.SetBlendState(device.BlendStates.Default);
             }
         }
 
-        private void Draw(GraphicsDevice device, Effect effect, RenderTarget renderTarget)
+        private void Draw(GraphicsDevice device, Effect effect, Texture renderTarget)
         {
             device.SetRenderTarget(renderTarget);
             effect.Apply(Data.Parameters, parameters);
             device.Draw(PrimitiveType.TriangleList, 3);
         }
 
-        private void DrawSlices(GraphicsDevice device, Effect effect, params RenderTarget[] renderTargets)
+        private void DrawSlices(GraphicsDevice device, Effect effect, params Texture[] renderTargets)
         {
             device.SetRenderTargets(renderTargets);
             parameters.Set(VolumeShaderBaseKeys.SliceCount, (uint)Data.Settings.AltitudeResolution);
@@ -140,44 +129,44 @@ namespace Clockwork.Atmosphere
             device.DrawInstanced(PrimitiveType.TriangleList, 3, Data.Settings.AltitudeResolution);
         }
 
-        private void Save(GraphicsDevice device, Texture2D texture, string url)
+        private void Save(GraphicsDevice device, Texture texture, string url)
         {
             var desc = texture.Description;
             desc.Format = PixelFormat.R8G8B8A8_UNorm;
             desc.Flags |= TextureFlags.RenderTarget;
-
-            using (var tex = Texture2D.New(device, desc))
-            using (var texTarget = tex.ToRenderTarget())
+            
+            using (var renderTarget = Texture.New(device, desc))
             {
                 //device.Clear(texTarget, Color.Black);
-                device.SetRenderTarget(texTarget);
+                device.SetRenderTarget(renderTarget);
                 device.DrawTexture(texture, device.SamplerStates.PointClamp);
-                Save(tex, url);
+                Save(renderTarget, url);
             }
         }
 
-        private void Save(Texture2D texture, string url)
+        private void Save(Texture texture, string url)
         {
             VirtualFileSystem.ApplicationBinary.CreateDirectory("Precomputed");
             using (var stream = VirtualFileSystem.ApplicationBinary.OpenStream("Precomputed/" + url, VirtualFileMode.Create, VirtualFileAccess.Write))
                 texture.Save(stream, ImageFileType.Png);
         }
 
-        private void SaveInscatter(GraphicsDevice device, Texture3D inscatter, string name)
+        private void SaveInscatter(GraphicsDevice device, Texture inscatter, string name)
         {
-            using (var compactInscatter = Texture2D.New(device, Data.Settings.SunZenithResolution * Data.Settings.ViewSunResolution, Data.Settings.ViewZenithResolution * Data.Settings.AltitudeResolution, PixelFormat.R8G8B8A8_UNorm, TextureFlags.RenderTarget | TextureFlags.ShaderResource))
-            using (var compactInscatterTarget = compactInscatter.ToRenderTarget())
+            var parameters = new ParameterCollection();
+
+            using (var compactInscatter = Texture.New2D(device, Data.Settings.SunZenithResolution * Data.Settings.ViewSunResolution, Data.Settings.ViewZenithResolution * Data.Settings.AltitudeResolution, PixelFormat.R8G8B8A8_UNorm, TextureFlags.RenderTarget | TextureFlags.ShaderResource))
             {
-                device.SetRenderTarget(compactInscatterTarget);
-                device.Clear(compactInscatterTarget, Color.Black);
+                device.SetRenderTarget(compactInscatter);
+                device.Clear(compactInscatter, Color.Black);
 
                 for (int i = 0; i < Data.Settings.AltitudeResolution; i++)
                 {
                     device.SetViewport(new Viewport(0, i * Data.Settings.ViewZenithResolution, Data.Settings.SunZenithResolution * Data.Settings.ViewSunResolution, Data.Settings.ViewZenithResolution));
-                    copySlice.Parameters.Set(CopySliceKeys.Source, inscatter);
-                    copySlice.Parameters.Set(CopySliceKeys.Slice, (i + 0.5f) / Data.Settings.AltitudeResolution);
+                    parameters.Set(CopySliceKeys.Source, inscatter);
+                    parameters.Set(CopySliceKeys.Slice, (i + 0.5f) / Data.Settings.AltitudeResolution);
 
-                    copySlice.Apply();
+                    copySlice.Apply(parameters);
                     device.Draw(PrimitiveType.TriangleList, 3);
                 }
 

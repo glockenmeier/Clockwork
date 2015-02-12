@@ -6,45 +6,29 @@
 // and re-save the associated .pdxfx.
 // </auto-generated>
 
+using System;
 using SiliconStudio.Core;
 using SiliconStudio.Paradox.Effects;
+using SiliconStudio.Paradox.Graphics;
 using SiliconStudio.Paradox.Shaders;
+using SiliconStudio.Core.Mathematics;
+using Buffer = SiliconStudio.Paradox.Graphics.Buffer;
 
-
-
-#line 1 "D:\Files\Projects\Clockwork\Source\Clockwork.Terrain\Shaders\DefaultEffects.pdxfx"
-
-
-#line 3
+using SiliconStudio.Paradox.Effects.Data;
 namespace Clockwork.Terrain.Shaders
 {
-    [DataContract]
-#line 5
-    public partial class TerrainParameters : ShaderMixinParameters
+    [DataContract]public partial class TerrainParameters : ShaderMixinParameters
     {
-
-        #line 7
         public static readonly ParameterKey<bool> UseInstancing = ParameterKeys.New<bool>();
-
-        #line 8
         public static readonly ParameterKey<bool> UseQuadTriangulation = ParameterKeys.New<bool>(true);
     };
-
-    #line 11
     internal static partial class ShaderMixins
     {
         internal partial class MorphDebugging  : IShaderMixinBuilder
         {
             public void Generate(ShaderMixinSourceTree mixin, ShaderMixinContext context)
             {
-
-                #line 13
-                context.CloneProperties();
-
-                #line 13
-                mixin.Mixin.CloneFrom(mixin.Parent.Mixin);
-
-                #line 14
+                context.CloneParentMixinToCurrent();
                 context.Mixin(mixin, "MorphDebugShading");
             }
 
@@ -56,80 +40,36 @@ namespace Clockwork.Terrain.Shaders
             }
         }
     }
-
-    #line 17
     internal static partial class ShaderMixins
     {
         internal partial class DefaultDeferredTerrainEffect  : IShaderMixinBuilder
         {
             public void Generate(ShaderMixinSourceTree mixin, ShaderMixinContext context)
             {
-
-                #line 22
                 context.Mixin(mixin, "TerrainBase");
-
-                #line 23
                 context.Mixin(mixin, "PositionVSStream");
-
-                #line 25
                 context.Mixin(mixin, "TerrainNormalMap");
-
-                #line 26
                 context.Mixin(mixin, "SplattingEffect");
-
-                #line 32
                 if (context.GetParam(TerrainParameters.UseQuadTriangulation))
-
-                    #line 33
                     context.Mixin(mixin, "TerrainQuadTriangulation");
-
-                #line 35
                 if (context.GetParam(TerrainParameters.UseInstancing))
-
-                    #line 36
                     context.Mixin(mixin, "TerrainTileInstanced");
-
-                #line 38
                 else
-
-                    #line 38
                     context.Mixin(mixin, "TerrainTileParameter");
-
-                #line 41
                 context.Mixin(mixin, "ParadoxGBufferPlugin");
-
-                #line 43
                 context.Mixin(mixin, "LightDeferredShading");
 
                 {
-
-                    #line 45
-                    var __subMixin = new ShaderMixinSourceTree() { Name = "ShadowMapCaster", Parent = mixin };
-                    mixin.Children.Add(__subMixin);
-
-                    #line 45
+                    var __subMixin = new ShaderMixinSourceTree() { Name = "ShadowMapCaster" };
                     context.BeginChild(__subMixin);
-
-                    #line 45
                     context.Mixin(__subMixin, "ShadowMapCaster");
-
-                    #line 45
                     context.EndChild();
                 }
 
                 {
-
-                    #line 47
-                    var __subMixin = new ShaderMixinSourceTree() { Name = "MorphDebugging", Parent = mixin };
-                    mixin.Children.Add(__subMixin);
-
-                    #line 47
+                    var __subMixin = new ShaderMixinSourceTree() { Name = "MorphDebugging" };
                     context.BeginChild(__subMixin);
-
-                    #line 47
                     context.Mixin(__subMixin, "MorphDebugging");
-
-                    #line 47
                     context.EndChild();
                 }
             }
@@ -142,58 +82,37 @@ namespace Clockwork.Terrain.Shaders
             }
         }
     }
-
-    #line 50
     internal static partial class ShaderMixins
     {
         internal partial class SplattingEffect  : IShaderMixinBuilder
         {
             public void Generate(ShaderMixinSourceTree mixin, ShaderMixinContext context)
             {
-
-                #line 53
                 mixin.Mixin.AddMacro("SPLATTING_BLEND_COUNT", context.GetParam(SplattingParameters.MaterialCount));
-
-                #line 54
                 context.Mixin(mixin, "Splatting");
-
-                #line 56
                 context.Mixin(mixin, "AlbedoDiffuseBase");
 
                 {
-
-                    #line 57
                     var __subMixin = new ShaderMixinSourceTree() { Parent = mixin };
-
-                    #line 57
+                    context.PushComposition(mixin, "albedoDiffuse", __subMixin);
                     context.Mixin(__subMixin, "AlbedoDiffuseSplatted");
-                    mixin.Mixin.AddComposition("albedoDiffuse", __subMixin.Mixin);
+                    context.PopComposition();
                 }
-
-                #line 59
                 context.Mixin(mixin, "AlbedoSpecularBase");
 
                 {
-
-                    #line 60
                     var __subMixin = new ShaderMixinSourceTree() { Parent = mixin };
-
-                    #line 60
+                    context.PushComposition(mixin, "albedoSpecular", __subMixin);
                     context.Mixin(__subMixin, "AlbedoSpecularSplatted");
-                    mixin.Mixin.AddComposition("albedoSpecular", __subMixin.Mixin);
+                    context.PopComposition();
                 }
-
-                #line 62
                 context.Mixin(mixin, "NormalMapTexture");
 
                 {
-
-                    #line 63
                     var __subMixin = new ShaderMixinSourceTree() { Parent = mixin };
-
-                    #line 63
+                    context.PushComposition(mixin, "normalMap", __subMixin);
                     context.Mixin(__subMixin, "NormalMapSplatted");
-                    mixin.Mixin.AddComposition("normalMap", __subMixin.Mixin);
+                    context.PopComposition();
                 }
             }
 
@@ -205,53 +124,33 @@ namespace Clockwork.Terrain.Shaders
             }
         }
     }
-
-    #line 73
     internal static partial class ShaderMixins
     {
         internal partial class AlbedoDiffuseSplatted  : IShaderMixinBuilder
         {
             public void Generate(ShaderMixinSourceTree mixin, ShaderMixinContext context)
             {
-
-                #line 78
                 context.Mixin(mixin, "ComputeColorSplatted");
-
-                #line 80
                 foreach(var ____1 in context.GetParam(SplattingParameters.Materials))
 
                 {
-
-                    #line 80
                     context.PushParameters(____1);
-
-                    #line 82
                     if (context.GetParam(MaterialParameters.AlbedoDiffuse) != null)
 
                         {
-
-                            #line 83
                             var __subMixin = new ShaderMixinSourceTree() { Parent = mixin };
-
-                            #line 83
+                            context.PushCompositionArray(mixin, "Layers", __subMixin);
                             context.Mixin(__subMixin, context.GetParam(MaterialParameters.AlbedoDiffuse));
-                            mixin.Mixin.AddCompositionToArray("Layers", __subMixin.Mixin);
+                            context.PopComposition();
                         }
-
-                    #line 85
                     else
 
                         {
-
-                            #line 85
                             var __subMixin = new ShaderMixinSourceTree() { Parent = mixin };
-
-                            #line 85
+                            context.PushCompositionArray(mixin, "Layers", __subMixin);
                             context.Mixin(__subMixin, "ComputeColor");
-                            mixin.Mixin.AddCompositionToArray("Layers", __subMixin.Mixin);
+                            context.PopComposition();
                         }
-
-                    #line 80
                     context.PopParameters();
                 }
             }
@@ -264,53 +163,33 @@ namespace Clockwork.Terrain.Shaders
             }
         }
     }
-
-    #line 89
     internal static partial class ShaderMixins
     {
         internal partial class AlbedoSpecularSplatted  : IShaderMixinBuilder
         {
             public void Generate(ShaderMixinSourceTree mixin, ShaderMixinContext context)
             {
-
-                #line 94
                 context.Mixin(mixin, "ComputeColorSplatted");
-
-                #line 96
                 foreach(var ____1 in context.GetParam(SplattingParameters.Materials))
 
                 {
-
-                    #line 96
                     context.PushParameters(____1);
-
-                    #line 98
                     if (context.GetParam(MaterialParameters.AlbedoSpecular) != null)
 
                         {
-
-                            #line 99
                             var __subMixin = new ShaderMixinSourceTree() { Parent = mixin };
-
-                            #line 99
+                            context.PushCompositionArray(mixin, "Layers", __subMixin);
                             context.Mixin(__subMixin, context.GetParam(MaterialParameters.AlbedoSpecular));
-                            mixin.Mixin.AddCompositionToArray("Layers", __subMixin.Mixin);
+                            context.PopComposition();
                         }
-
-                    #line 101
                     else
 
                         {
-
-                            #line 101
                             var __subMixin = new ShaderMixinSourceTree() { Parent = mixin };
-
-                            #line 101
+                            context.PushCompositionArray(mixin, "Layers", __subMixin);
                             context.Mixin(__subMixin, "ComputeColor");
-                            mixin.Mixin.AddCompositionToArray("Layers", __subMixin.Mixin);
+                            context.PopComposition();
                         }
-
-                    #line 96
                     context.PopParameters();
                 }
             }
@@ -323,53 +202,33 @@ namespace Clockwork.Terrain.Shaders
             }
         }
     }
-
-    #line 105
     internal static partial class ShaderMixins
     {
         internal partial class NormalMapSplatted  : IShaderMixinBuilder
         {
             public void Generate(ShaderMixinSourceTree mixin, ShaderMixinContext context)
             {
-
-                #line 110
                 context.Mixin(mixin, "ComputeColorSplatted");
-
-                #line 112
                 foreach(var ____1 in context.GetParam(SplattingParameters.Materials))
 
                 {
-
-                    #line 112
                     context.PushParameters(____1);
-
-                    #line 114
                     if (context.GetParam(MaterialParameters.NormalMap) != null)
 
                         {
-
-                            #line 115
                             var __subMixin = new ShaderMixinSourceTree() { Parent = mixin };
-
-                            #line 115
+                            context.PushCompositionArray(mixin, "Layers", __subMixin);
                             context.Mixin(__subMixin, context.GetParam(MaterialParameters.NormalMap));
-                            mixin.Mixin.AddCompositionToArray("Layers", __subMixin.Mixin);
+                            context.PopComposition();
                         }
-
-                    #line 117
                     else
 
                         {
-
-                            #line 117
                             var __subMixin = new ShaderMixinSourceTree() { Parent = mixin };
-
-                            #line 117
+                            context.PushCompositionArray(mixin, "Layers", __subMixin);
                             context.Mixin(__subMixin, "ComputeColorNormalFlat");
-                            mixin.Mixin.AddCompositionToArray("Layers", __subMixin.Mixin);
+                            context.PopComposition();
                         }
-
-                    #line 112
                     context.PopParameters();
                 }
             }

@@ -13,9 +13,9 @@ namespace Clockwork.Terrain
         private ITileChannelStore store;
         private byte[] nullData;
 
-        public Texture2D Texture { get; private set; }
+        public Texture Texture { get; private set; }
 
-        public event Action<Texture2D> TextureChanged;
+        public event Action<Texture> TextureChanged;
 
         public TextureContentChannel(ITileChannelStore store, GraphicsDevice device, TextureContentChannelData data)
         {
@@ -26,7 +26,7 @@ namespace Clockwork.Terrain
             description.Usage = GraphicsResourceUsage.Default;
             description.Flags = TextureFlags.ShaderResource;
 
-            Texture = Texture2D.New(device, description);
+            Texture = Texture.New(device, description);
             nullData = new byte[Texture.CalculateWidth<byte>() * Texture.Height];
         }
 
@@ -62,7 +62,7 @@ namespace Clockwork.Terrain
                 description.ArraySize += ArraySizeIncrement;
 
                 var oldTexture = Texture;
-                Texture = Texture2D.New(device, description);
+                Texture = Texture.New(device, description);
 
                 for (int i = 0; i < oldTexture.Description.ArraySize; i++)
                     device.CopyRegion(oldTexture, i, null, Texture, i);

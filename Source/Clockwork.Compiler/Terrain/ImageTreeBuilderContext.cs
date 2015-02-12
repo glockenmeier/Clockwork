@@ -10,8 +10,6 @@ namespace Clockwork.Terrain.Compiler
 
         public PrimitiveQuad Quad { get; private set; }
 
-        public SimpleEffect Effect { get; private set; }
-
         public SamplerState SamplerState { get; private set; }
 
         public RasterizerState ScissorTestEnabled { get; private set; }
@@ -19,8 +17,7 @@ namespace Clockwork.Terrain.Compiler
         public ImageTreeBuilderContext()
         {
             GraphicsDevice = GraphicsDevice.New().DisposeBy(this);
-            Effect = new SimpleEffect(GraphicsDevice).DisposeBy(this);
-            Quad = new PrimitiveQuad(GraphicsDevice, Effect).DisposeBy(this);
+            Quad = new PrimitiveQuad(GraphicsDevice).DisposeBy(this);
             SamplerState = SamplerState.New(GraphicsDevice, new SamplerStateDescription(TextureFilter.Linear, TextureAddressMode.Border) { BorderColor = Color.Black }).DisposeBy(this);
             ScissorTestEnabled = RasterizerState.New(GraphicsDevice, new RasterizerStateDescription(CullMode.None) { ScissorTestEnable = true }).DisposeBy(this);
         }

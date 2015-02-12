@@ -2,7 +2,6 @@
 using SiliconStudio.Core;
 using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Paradox.Effects;
-using SiliconStudio.Paradox.Effects.Modules;
 using SiliconStudio.Paradox.Graphics;
 using System;
 
@@ -94,7 +93,7 @@ namespace Clockwork.Terrain
             Content.Observe();
         }
 
-        public void Draw(RenderContext renderContext, Effect effect)
+        public void Draw(RenderContext renderContext, Effect effect, ParameterCollection effectParams)
         {
             var view = renderContext.CurrentPass.Parameters.Get(TransformationKeys.View);
             var projection = renderContext.CurrentPass.Parameters.Get(TransformationKeys.Projection);
@@ -135,12 +134,12 @@ namespace Clockwork.Terrain
                 };
             }
 
-            effect.Parameters.Set(TransformationKeys.World, Matrix.Identity);
+            effectParams.Set(TransformationKeys.World, Matrix.Identity);
             for (int i = 0; i < instanceCount; i++)
             {
                 var data = bufferData[i];
-                effect.Parameters.Set(TerrainRenderer.TileInfo, data);
-                effect.Apply(renderContext.CurrentPass.Parameters, parameters, true);
+                effectParams.Set(TerrainRenderer.TileInfo, data);
+                effect.Apply(renderContext.CurrentPass.Parameters, effectParams, parameters, true);
                 patch.Draw(renderContext.GraphicsDevice, true);
             }
         }

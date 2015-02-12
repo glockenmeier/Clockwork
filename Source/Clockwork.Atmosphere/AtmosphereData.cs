@@ -1,7 +1,6 @@
 ﻿using SiliconStudio.Core;
 using SiliconStudio.Core.Serialization;
 using SiliconStudio.Paradox.Effects;
-using SiliconStudio.Paradox.Effects.Modules;
 using SiliconStudio.Paradox.Graphics;
 using System.IO;
 
@@ -11,16 +10,18 @@ namespace Clockwork.Atmosphere
     {
         public AtmosphereSettings Settings { get; private set; }
 
-        public Texture2D Transmittance { get; private set; }
+        public Texture Transmittance { get; private set; }
 
-        public Texture2D Irradiance { get; private set; }
+        public Texture Irradiance { get; private set; }
 
-        public Texture3D Inscatter { get; private set; }
+        public Texture Inscatter { get; private set; }
 
         public ParameterCollection Parameters { get; private set; }
 
-        public AtmosphereData(AtmosphereSettings settings, Texture2D transmittance, Texture2D irradiance, Texture3D inscatter)
+        public AtmosphereData(AtmosphereSettings settings, Texture transmittance, Texture irradiance, Texture inscatter)
         {
+            // TODO: Texture dimension check
+
             Settings = settings;
             Transmittance = transmittance;
             Irradiance = irradiance;
@@ -33,14 +34,14 @@ namespace Clockwork.Atmosphere
         {
             Settings = settings;
 
-            Transmittance = Texture2D.New(device, settings.TransmittanceSize.Width, settings.TransmittanceSize.Height,
+            Transmittance = Texture.New2D(device, settings.TransmittanceSize.Width, settings.TransmittanceSize.Height,
                 PixelFormat.R11G11B10_Float, TextureFlags.ShaderResource | TextureFlags.RenderTarget).DisposeBy(this);
 
-            Inscatter = Texture3D.New(device, settings.SunZenithResolution * settings.ViewSunResolution,
+            Inscatter = Texture.New3D(device, settings.SunZenithResolution * settings.ViewSunResolution,
                 settings.ViewZenithResolution, settings.AltitudeResolution, PixelFormat.R32G32B32A32_Float, //R16G16B16A16_Float,
                 TextureFlags.ShaderResource | TextureFlags.RenderTarget).DisposeBy(this);
 
-            Irradiance = Texture2D.New(device, settings.SkySize.Width, settings.SkySize.Height,
+            Irradiance = Texture.New2D(device, settings.SkySize.Width, settings.SkySize.Height,
                 PixelFormat.R11G11B10_Float, TextureFlags.ShaderResource | TextureFlags.RenderTarget).DisposeBy(this);
 
             Initialize();
@@ -55,20 +56,19 @@ namespace Clockwork.Atmosphere
             long irradianceSize = reader.ReadInt64();
             long inscatterSize = reader.ReadInt64();
 
-            Texture2D transmittance, irradiance;
-            Texture3D inscatter;
+            Texture transmittance, irradiance, inscatter;
 
             var buffer = reader.ReadBytes((int)transmittanceSize);
             using (var data = new MemoryStream(buffer))
-                transmittance = Texture2D.Load(device, data);
+                transmittance = Texture.Load(device, data);
 
             buffer = reader.ReadBytes((int)irradianceSize);
             using (var data = new MemoryStream(buffer))
-                irradiance = Texture2D.Load(device, data);
+                irradiance = Texture.Load(device, data);
 
             buffer = reader.ReadBytes((int)inscatterSize);
             using (var data = new MemoryStream(buffer))
-                inscatter = Texture3D.Load(device, data);
+                inscatter = Texture.Load(device, data);
 
             return new AtmosphereData(settings, transmittance, irradiance, inscatter);
         }

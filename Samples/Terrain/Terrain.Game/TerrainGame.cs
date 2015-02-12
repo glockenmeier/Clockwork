@@ -7,9 +7,8 @@ using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Paradox;
 using SiliconStudio.Paradox.DataModel;
 using SiliconStudio.Paradox.Effects;
-using SiliconStudio.Paradox.Effects.Modules;
-using SiliconStudio.Paradox.Effects.Modules.Processors;
-using SiliconStudio.Paradox.Effects.Modules.Renderers;
+using SiliconStudio.Paradox.Effects.Processors;
+using SiliconStudio.Paradox.Effects.Renderers;
 using SiliconStudio.Paradox.Engine;
 using SiliconStudio.Paradox.EntityModel;
 using SiliconStudio.Paradox.Games;
@@ -24,6 +23,7 @@ namespace Terrain
 {
     using Clockwork;
     using Clockwork.Physics;
+    using SiliconStudio.Paradox.Effects.ShadowMaps;
 
     public class TerrainGame : Game
     {
@@ -121,7 +121,7 @@ namespace Terrain
             renderers.Add(gBufferRenderProcessor);
 
             // Light prepass
-            var lightPrePass = new LightingPrepassRenderer(Services, prepassEffectName, GraphicsDevice.DepthStencilBuffer.Texture, gBufferRenderProcessor.GBufferTexture);
+            var lightPrePass = new LightingPrepassRenderer(Services, prepassEffectName, GraphicsDevice.DepthStencilBuffer, gBufferRenderProcessor.GBufferTexture);
             renderers.Add(lightPrePass);
 
             renderers.Add(new RenderTargetSetter(Services)
@@ -148,9 +148,9 @@ namespace Terrain
 
         private class RootRenderer : ElementRenderer
         {
-            RenderTarget uiScreenRenderTarget;
+            Texture uiScreenRenderTarget;
 
-            public RootRenderer(IServiceRegistry services, RenderTarget uiScreenRenderTarget)
+            public RootRenderer(IServiceRegistry services, Texture uiScreenRenderTarget)
                 : base(services)
             {
                 this.uiScreenRenderTarget = uiScreenRenderTarget;
@@ -159,7 +159,7 @@ namespace Terrain
             public override void RenderColor(UIElement element, UIRenderingContext context)
             {
                 context.RenderTarget = uiScreenRenderTarget;
-                GraphicsDevice.SetRenderTarget(context.DepthStencilBuffer, uiScreenRenderTarget);
+                GraphicsDevice.SetDepthAndRenderTargets(context.DepthStencilBuffer, uiScreenRenderTarget);
                 base.RenderColor(element, context);
             }
         }

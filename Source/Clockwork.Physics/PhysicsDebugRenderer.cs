@@ -5,7 +5,6 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using SiliconStudio.Core;
 using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Paradox.Effects;
-using SiliconStudio.Paradox.Effects.Modules;
 using SiliconStudio.Paradox.Extensions;
 using SiliconStudio.Paradox.Graphics;
 using System;
@@ -144,10 +143,14 @@ namespace Clockwork.Physics
         private Effect effect;
         private Space space;
         private Color[] colors;
+        private ParameterCollection parameters;
 
         public PhysicsDebugRenderer(IServiceRegistry services, string effectName) : base(services)
         {
             effect = EffectSystem.LoadEffect(effectName);
+
+            parameters = new ParameterCollection();
+
             colors = new[] 
             { 
                 new Color(255, 216, 0),
@@ -197,10 +200,10 @@ namespace Clockwork.Physics
             foreach (var mesh in meshes.Values)
             {
                 int colorIndex = mesh.MaterialIndex % colors.Length;
-                effect.Parameters.Set(SpriteEffectKeys.Color, colors[colorIndex]);
-                effect.Parameters.Set(TransformationKeys.World, mesh.LocalTransform);
+                parameters.Set(SpriteEffectKeys.Color, colors[colorIndex]);
+                parameters.Set(TransformationKeys.World, mesh.LocalTransform);
                 
-                effect.Apply(renderContext.CurrentPass.Parameters);
+                effect.Apply(renderContext.CurrentPass.Parameters, parameters);
 
                 GraphicsDevice.SetRasterizerState(GraphicsDevice.RasterizerStates.CullNone);
                 GraphicsDevice.SetVertexArrayObject(mesh.VertexArrayObject);

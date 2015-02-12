@@ -2,6 +2,7 @@
 using FreeImageNET::FreeImageAPI;
 using SiliconStudio.Core;
 using SiliconStudio.Core.Mathematics;
+using SiliconStudio.Paradox.Effects;
 using SiliconStudio.Paradox.Graphics;
 using System;
 
@@ -9,14 +10,14 @@ namespace Clockwork.Terrain.Compiler
 {
     public interface IImageSource
     {
-        bool TryGenerate(ImageTreeBuilderContext context, Int2 position, RenderTarget renderTarget);
+        bool TryGenerate(ImageTreeBuilderContext context, Int2 position, Texture renderTarget);
     }
 
     public class ImageSource : ComponentBase, IImageSource
     {
         public TerrainMetrics Metrics { get; set; }
 
-        public Texture2D Texture { get; private set; }
+        public Texture Texture { get; private set; }
 
         public ImageSource(GraphicsDevice device, string url)
         {
@@ -54,7 +55,7 @@ namespace Clockwork.Terrain.Compiler
 
                 using (var image = Image.New2D(width, height, 1, format, 1, dataPointer, rowStride))
                 {
-                    Texture = Texture2D.New(device, image).DisposeBy(this);
+                    Texture = Texture.New(device, image).DisposeBy(this);
                 }
             }
             finally
@@ -69,7 +70,7 @@ namespace Clockwork.Terrain.Compiler
             }*/
         }
 
-        public bool TryGenerate(ImageTreeBuilderContext context, Int2 position, RenderTarget renderTarget)
+        public bool TryGenerate(ImageTreeBuilderContext context, Int2 position, Texture renderTarget)
         {
             var windowPosition = new Point(position.X * Metrics.PatchVertexStride - Metrics.Padding.X, position.Y * Metrics.PatchVertexStride - Metrics.Padding.X);
             var patchRect = new RectangleF(position.X * Metrics.PatchVertexStride, position.Y * Metrics.PatchVertexStride, Metrics.EffectiveVerticesPerPatch, Metrics.EffectiveVerticesPerPatch);
@@ -85,9 +86,9 @@ namespace Clockwork.Terrain.Compiler
 
             context.GraphicsDevice.SetRasterizerState(context.GraphicsDevice.RasterizerStates.CullNone);
             context.GraphicsDevice.Clear(renderTarget, Color.Black);
-            context.GraphicsDevice.SetRenderTargets(renderTarget);
+            context.GraphicsDevice.SetRenderTarget(renderTarget);
             
-            context.Effect.Transform = transform;
+            context.Quad.Parameters.Set(SpriteBaseKeys.MatrixTransform, transform);
             context.Quad.Draw(Texture, context.SamplerState, Color.White);
             
             return true;

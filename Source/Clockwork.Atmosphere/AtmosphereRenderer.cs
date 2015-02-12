@@ -1,7 +1,6 @@
 ﻿using SiliconStudio.Core;
 using SiliconStudio.Core.Mathematics;
 using SiliconStudio.Paradox.Effects;
-using SiliconStudio.Paradox.Effects.Modules;
 using SiliconStudio.Paradox.Engine;
 using SiliconStudio.Paradox.Graphics;
 using System;
@@ -14,6 +13,7 @@ namespace Clockwork.Atmosphere
         private AtmosphereData data;
         private Effect effect;
         private LightComponent sunLight;
+        private ParameterCollection parameters = new ParameterCollection();
 
         public AtmosphereRenderer(IServiceRegistry services, AtmosphereData data, LightComponent sunLight)
             : base(services)
@@ -48,11 +48,11 @@ namespace Clockwork.Atmosphere
             GraphicsDevice.SetBlendState(blendState);
             GraphicsDevice.SetRenderTarget(GraphicsDevice.BackBuffer);
 
-            effect.Parameters.Set(AtmosphereLightingKeys.CenterVS, Vector3.TransformNormal(Vector3.UnitY * -altitude, view));
-            effect.Parameters.Set(AtmosphereLightingKeys.SunDirectionVS, Vector3.TransformNormal(sunDirection, view));
+            parameters.Set(AtmosphereLightingKeys.CenterVS, Vector3.TransformNormal(Vector3.UnitY * -altitude, view));
+            parameters.Set(AtmosphereLightingKeys.SunDirectionVS, Vector3.TransformNormal(sunDirection, view));
 
             // TODO: Handle state correctly
-            effect.Apply(context.CurrentPass.Parameters, data.Parameters);
+            effect.Apply(context.CurrentPass.Parameters, data.Parameters, parameters);
 
             GraphicsDevice.Draw(PrimitiveType.TriangleList, 3);
         }

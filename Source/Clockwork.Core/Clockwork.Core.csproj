@@ -85,8 +85,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>VolumeShaderBase.pdxsl</DependentUpon>
     </Compile>
-    <Compile Include="Graphics\RenderTargetPool.cs" />
-    <None Include="Graphics\RenderTargetStack.cs" />
     <Compile Include="HeightMap.cs" />
     <Compile Include="DataStructures\Octree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

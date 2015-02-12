@@ -1,5 +1,6 @@
 ﻿using SiliconStudio.Core;
 using SiliconStudio.Core.Mathematics;
+using SiliconStudio.Paradox.Effects;
 using SiliconStudio.Paradox.Graphics;
 using SiliconStudio.TextureConverter;
 using System;
@@ -15,18 +16,18 @@ namespace Clockwork.Terrain.Compiler
             public Matrix Transform;
             public Rectangle ScissorRectangle;
 
-            public RenderTarget LeafIntermediate;
-            public RenderTarget LeafTarget;
+            public Texture LeafIntermediate;
+            public Texture LeafTarget;
         }
 
-        public delegate bool SourceTextureProvider(Int2 position, RenderTarget renderTarget);
+        public delegate bool SourceTextureProvider(Int2 position, Texture renderTarget);
 
-        private RenderTarget[] intermediates;
-        private RenderTarget target;
+        private Texture[] intermediates;
+        private Texture target;
         private PixelFormat targetFormat;
         private QuadrantData[] quadrants;
         private Matrix windowingTransform;
-        private Texture2D stagingTexture;
+        private Texture stagingTexture;
 
         public ImageTreeBuilderContext Context { get; private set; }
 
@@ -44,9 +45,9 @@ namespace Clockwork.Terrain.Compiler
 
             target = CreateRenderTarget(metrics.VerticesPerPatch, intermediateFormat);
 
-            stagingTexture = Texture2D.New(Context.GraphicsDevice, target.Description.ToStagingDescription()).DisposeBy(this);
+            stagingTexture = Texture.New(Context.GraphicsDevice, target.Description.ToStagingDescription()).DisposeBy(this);
 
-            intermediates = new RenderTarget[metrics.LevelCount];
+            intermediates = new Texture[metrics.LevelCount];
             for (int i = 0; i < metrics.LevelCount; i++)
                 intermediates[i] = CreateRenderTarget(metrics.SourceSize, intermediateFormat);
 
@@ -95,10 +96,9 @@ namespace Clockwork.Terrain.Compiler
                 Matrix.Scaling((float)Metrics.SourceSize / Metrics.VerticesPerPatch);
         }
 
-        private RenderTarget CreateRenderTarget(int size, PixelFormat format)
+        private Texture CreateRenderTarget(int size, PixelFormat format)
         {
-            var texture = Texture2D.New(Context.GraphicsDevice, size, size, 1, format, TextureFlags.ShaderResource | TextureFlags.RenderTarget).DisposeBy(this);
-            return texture.ToRenderTarget().DisposeBy(this);
+            return Texture.New2D(Context.GraphicsDevice, size, size, 1, format, TextureFlags.ShaderResource | TextureFlags.RenderTarget).DisposeBy(this);
         }
 
         public void Build()
@@ -150,12 +150,12 @@ namespace Clockwork.Terrain.Compiler
             if (depth > 0)
             {
                 var quadrant = quadrants[(position.X % 2) + ((position.Y % 2) << 1)];
-                Draw(intermediates[depth].Texture, quadrant.Transform, intermediates[depth - 1], quadrant.ScissorRectangle);
+                Draw(intermediates[depth], quadrant.Transform, intermediates[depth - 1], quadrant.ScissorRectangle);
             }
 
-            Draw(intermediates[depth].Texture, windowingTransform, target);
+            Draw(intermediates[depth], windowingTransform, target);
 
-            await Save(target.Texture, depth, (int)position.X, (int)position.Y);
+            await Save(target, depth, (int)position.X, (int)position.Y);
             
             return true;
         }
@@ -175,9 +175,9 @@ namespace Clockwork.Terrain.Compiler
             return Matrix.Translation(-(Vector3)scaleCenter) * Matrix.Scaling(scale.X, scale.Y, 1) * Matrix.Translation((Vector3)scaleCenter);
         }
 
-        private void Draw(Texture source, Matrix transform, RenderTarget target, Rectangle? scissorRectangle = null)
+        private void Draw(Texture source, Matrix transform, Texture target, Rectangle? scissorRectangle = null)
         {
-            Context.GraphicsDevice.SetRenderTargets(target);
+            Context.GraphicsDevice.SetRenderTarget(target);
 
             if (scissorRectangle.HasValue)
             {
@@ -189,7 +189,7 @@ namespace Clockwork.Terrain.Compiler
                 Context.GraphicsDevice.SetRasterizerState(Context.GraphicsDevice.RasterizerStates.CullNone);
             }
 
-            Context.Effect.Transform = transform;
+            Context.Quad.Parameters.Set(SpriteBaseKeys.MatrixTransform, transform);
             Context.Quad.Draw(source);
         }
 
